@@ -11,6 +11,28 @@ namespace BlogsConsole
         private static NLog.Logger logger = NLogBuilder.ConfigureNLog(Directory.GetCurrentDirectory() + "\\nlog.config").GetCurrentClassLogger();
         static void Main(string[] args)
         {
+            /* OUTLINE:
+            Present User with 5 choices: 
+            1 - View all Blogs
+                Display num of blogs and then all blogs
+            2 - Add Blog
+            3 - Create Post
+                - Prompt user with blog choices, to decide which one to use
+                - Save post to Posts table
+            4 - View all Posts
+                - Prompt user w/ blog choices, to decide which blog's posts to view
+                - Display number of posts + all posts
+                    Per post, display Blog Name, Post Title, and Post Content
+            5 - Quit
+            
+            Personal Touches:
+            - Menus in special color
+            - Listing of blogs/posts in other special color
+            - User prompting in White
+            - Errors in orange?
+
+            Loop until user wants to quit
+            */
             logger.Info("Program started");
 
             try
