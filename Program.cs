@@ -8,8 +8,19 @@ namespace BlogsConsole
     class Program
     {
         //This method will allow the user to view all blogs
-        static void viewBlogs(){
-            
+        static void viewBlogs(BlogsConsole.BloggingContext db){
+            //Display number of blogs
+            int count = db.Blogs.Count();
+            Console.WriteLine("Blog Count:" + count.ToString());
+
+            // Display all Blogs from the database
+            var query = db.Blogs.OrderBy(b => b.Name);
+
+            Console.WriteLine("All blogs in the database:");
+            foreach (var item in query)
+            {
+                Console.WriteLine(item.Name);
+            }
         }
         
         //This method will allow the user to add a blog - pass in the database
@@ -91,6 +102,7 @@ namespace BlogsConsole
                 switch(ans){
                     case "1":
                         logger.Info("View all blogs");
+                        viewBlogs(db);
                         break;
                     case "2":
                         logger.Info("Create a blog");   
