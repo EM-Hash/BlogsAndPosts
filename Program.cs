@@ -7,6 +7,37 @@ namespace BlogsConsole
 {
     class Program
     {
+
+        //This method will allow the user to add a blog
+        static void addBlog(){
+            try
+            {
+
+                // Create and save a new Blog
+                Console.Write("Enter a name for a new Blog: ");
+                var name = Console.ReadLine();
+
+                var blog = new Blog { Name = name };
+
+                var db = new BloggingContext();
+                db.AddBlog(blog);
+                logger.Info("Blog added - {name}", name);
+
+                // Display all Blogs from the database
+                var query = db.Blogs.OrderBy(b => b.Name);
+
+                Console.WriteLine("All blogs in the database:");
+                foreach (var item in query)
+                {
+                    Console.WriteLine(item.Name);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
+            }
+        }
+
         // create static instance of Logger
         private static NLog.Logger logger = NLogBuilder.ConfigureNLog(Directory.GetCurrentDirectory() + "\\nlog.config").GetCurrentClassLogger();
         static void Main(string[] args)
@@ -49,13 +80,14 @@ namespace BlogsConsole
                 Console.ForegroundColor = ConsoleColor.White;
                 //Save the answer
                 string ans = Console.ReadLine();
-                logger.Info("Answer switch");
+                logger.Info("Main Menu switch");
                 switch(ans){
                     case "1":
                         logger.Info("View all blogs");
                         break;
                     case "2":
-                        logger.Info("Create a blog");    
+                        logger.Info("Create a blog");   
+                        addBlog(); 
                         break;
                     case "3":
                         logger.Info("Create a post");
@@ -73,32 +105,7 @@ namespace BlogsConsole
                         break;
                 }
             } while (progRun);
-            // try
-            // {
-
-            //     // Create and save a new Blog
-            //     Console.Write("Enter a name for a new Blog: ");
-            //     var name = Console.ReadLine();
-
-            //     var blog = new Blog { Name = name };
-
-            //     var db = new BloggingContext();
-            //     db.AddBlog(blog);
-            //     logger.Info("Blog added - {name}", name);
-
-            //     // Display all Blogs from the database
-            //     var query = db.Blogs.OrderBy(b => b.Name);
-
-            //     Console.WriteLine("All blogs in the database:");
-            //     foreach (var item in query)
-            //     {
-            //         Console.WriteLine(item.Name);
-            //     }
-            // }
-            // catch (Exception ex)
-            // {
-            //     logger.Error(ex.Message);
-            // }
+            
 
             logger.Info("Program ended");
         }
