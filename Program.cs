@@ -7,20 +7,19 @@ namespace BlogsConsole
 {
     class Program
     {
-        //This method will allow the user to view all blogs
-        static void viewBlogs(BlogsConsole.BloggingContext db){
-            
-        }
-        
-        //This method will allow the user to add a blog - pass in the database
-        static void addBlog(BlogsConsole.BloggingContext db){
+
+        //This method will allow the user to add a blog
+        static void addBlog(){
             try
             {
+
                 // Create and save a new Blog
                 Console.Write("Enter a name for a new Blog: ");
                 var name = Console.ReadLine();
+
                 var blog = new Blog { Name = name };
-                
+
+                var db = new BloggingContext();
                 db.AddBlog(blog);
                 logger.Info("Blog added - {name}", name);
 
@@ -41,10 +40,8 @@ namespace BlogsConsole
 
         // create static instance of Logger
         private static NLog.Logger logger = NLogBuilder.ConfigureNLog(Directory.GetCurrentDirectory() + "\\nlog.config").GetCurrentClassLogger();
-        
         static void Main(string[] args)
         {
-
             /* OUTLINE:
             Present User with 5 choices: 
             1 - View all Blogs
@@ -67,10 +64,6 @@ namespace BlogsConsole
 
             Loop until user wants to quit
             */
-
-            //Create the database
-            var db = new BloggingContext();
-            
             logger.Info("Program started");
             //Is the program still going? 
             bool progRun = true;
@@ -94,7 +87,7 @@ namespace BlogsConsole
                         break;
                     case "2":
                         logger.Info("Create a blog");   
-                        addBlog(db); 
+                        addBlog(); 
                         break;
                     case "3":
                         logger.Info("Create a post");
