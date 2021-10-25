@@ -26,41 +26,79 @@ namespace BlogsConsole
             5 - Quit
             
             Personal Touches:
-            - Menus in special color
-            - Listing of blogs/posts in other special color
+            - Menus in special color - green
+            - Listing of blogs/posts in other special color - cyan
             - User prompting in White
             - Errors in orange?
 
             Loop until user wants to quit
             */
             logger.Info("Program started");
-
-            try
-            {
-
-                // Create and save a new Blog
-                Console.Write("Enter a name for a new Blog: ");
-                var name = Console.ReadLine();
-
-                var blog = new Blog { Name = name };
-
-                var db = new BloggingContext();
-                db.AddBlog(blog);
-                logger.Info("Blog added - {name}", name);
-
-                // Display all Blogs from the database
-                var query = db.Blogs.OrderBy(b => b.Name);
-
-                Console.WriteLine("All blogs in the database:");
-                foreach (var item in query)
-                {
-                    Console.WriteLine(item.Name);
+            //Is the program still going? 
+            bool progRun = true;
+            do{
+                //Give the user the menu
+                logger.Info("Display Menu");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Welcome! What would you like to do?: ");
+                Console.WriteLine("[1] View all blogs");
+                Console.WriteLine("[2] Add a blog");
+                Console.WriteLine("[3] Create a post");
+                Console.WriteLine("[4] View all posts");
+                Console.WriteLine("[5] Quit");
+                Console.ForegroundColor = ConsoleColor.White;
+                //Save the answer
+                string ans = Console.ReadLine();
+                logger.Info("Answer switch");
+                switch(ans){
+                    case "1":
+                        logger.Info("View all blogs");
+                        break;
+                    case "2":
+                        logger.Info("Create a blog");    
+                        break;
+                    case "3":
+                        logger.Info("Create a post");
+                        break;
+                    case "4": 
+                        logger.Info("View all posts");
+                        break;
+                    default:
+                        logger.Info("Quit program");
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("Goodbye!");
+                        Console.WriteLine("Shutting down...");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        progRun = false;
+                        break;
                 }
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message);
-            }
+            } while (progRun);
+            // try
+            // {
+
+            //     // Create and save a new Blog
+            //     Console.Write("Enter a name for a new Blog: ");
+            //     var name = Console.ReadLine();
+
+            //     var blog = new Blog { Name = name };
+
+            //     var db = new BloggingContext();
+            //     db.AddBlog(blog);
+            //     logger.Info("Blog added - {name}", name);
+
+            //     // Display all Blogs from the database
+            //     var query = db.Blogs.OrderBy(b => b.Name);
+
+            //     Console.WriteLine("All blogs in the database:");
+            //     foreach (var item in query)
+            //     {
+            //         Console.WriteLine(item.Name);
+            //     }
+            // }
+            // catch (Exception ex)
+            // {
+            //     logger.Error(ex.Message);
+            // }
 
             logger.Info("Program ended");
         }
