@@ -70,8 +70,6 @@ namespace BlogsConsole
 
             //Create the database
             var db = new BloggingContext();
-
-            Console.WriteLine(db.GetType());
             
             logger.Info("Program started");
             //Is the program still going? 
