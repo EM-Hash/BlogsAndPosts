@@ -12,8 +12,9 @@ namespace BlogsConsole
             logger.Info("viewBlogs method start");
             //Display number of blogs
             int count = db.Blogs.Count();
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Blog Count:" + count.ToString());
-
+            Console.ForegroundColor = ConsoleColor.Black;
             // Display all Blogs from the database
             var query = db.Blogs.OrderBy(b => b.Name);
 
@@ -21,7 +22,9 @@ namespace BlogsConsole
             Console.WriteLine("All blogs in the database:");
             foreach (var item in query)
             {
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine(item.Name);
+                Console.ForegroundColor = ConsoleColor.Black;
             }
             logger.Info("viewBlogs method complete");
         }
@@ -33,7 +36,6 @@ namespace BlogsConsole
             {
                 logger.Info("Creating blog...");
                 // Create and save a new Blog
-                Console.Write("Enter a name for a new Blog: ");
                 string name = getFilledAnswer("name", "blog");
                 var blog = new Blog { Name = name };
                 
@@ -42,7 +44,9 @@ namespace BlogsConsole
             }
             catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
                 logger.Error(ex.Message);
+                Console.ForegroundColor = ConsoleColor.Black;
             }
             logger.Info("addBlog method complete");
         }
@@ -57,7 +61,9 @@ namespace BlogsConsole
             do{
                 logger.Info("Prompting user for valid ID");
                 try{
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Which blog do you wish to post to?: ");
+                    Console.ForegroundColor = ConsoleColor.Black;
                     blogId = getValidBlogId();
                 } catch (Exception ex){
                     logger.Error(ex.Message);
@@ -67,11 +73,15 @@ namespace BlogsConsole
 
                 logger.Info("Prompting user for post info");
                 //Prompt the user for the Title
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("What is the title of the post?");
+                Console.ForegroundColor = ConsoleColor.Black;
                 string title = Console.ReadLine();
 
                 //Prompt the user for theContent
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("What is the content of the post?");
+                Console.ForegroundColor = ConsoleColor.Black;
                 string content = Console.ReadLine();
                 logger.Info("Post information gathered");
 
@@ -85,7 +95,9 @@ namespace BlogsConsole
 
                 //Ask if the user wants to add another post
                 logger.Info("Checking if user wants to create another post");
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Add another post? [Y/N]: ");
+                Console.ForegroundColor = ConsoleColor.Black;
                 string contAns = Console.ReadLine();
                 if(contAns.ToLower()[0] == 'y'){
                     logger.Info("User will create another post");
@@ -109,7 +121,9 @@ namespace BlogsConsole
             //Display the blogs by order of blog id
             logger.Info("list all blogs in order of BlogId");
             foreach(Blog b in blogQuery){
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine($"[{b.BlogId}] {b.Name}");
+                Console.ForegroundColor = ConsoleColor.Black;
             }
             logger.Info("blogMenu method complete");
             return;
@@ -130,7 +144,9 @@ namespace BlogsConsole
                 string input = Console.ReadLine();
                 //Test if the input is an integer
                 if(!Int32.TryParse(input, out id)){
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     logger.Warn("User attempted to input non-integer value");
+                    Console.ForegroundColor = ConsoleColor.Black;
                     //If not, tell the user it must be
                     Console.WriteLine("The Blog ID must be an integer");
                     //Continue and reloop
@@ -146,9 +162,13 @@ namespace BlogsConsole
                         validId = true;
                         continue;
                     } else {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         logger.Warn("User entered an ID for a blog that does not exist");
+                        Console.ForegroundColor = ConsoleColor.Black;
                         //Otherwise, tell the user there's no blog with that id and re=loop
+                        Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("There is no blog with the given ID");
+                        Console.ForegroundColor = ConsoleColor.Black;
                         continue;
                     }
                 }
@@ -167,12 +187,17 @@ namespace BlogsConsole
             do{
                 logger.Info("Begin information gathering loop");
                 //Prompt the user for the value
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"What is the {varNeeded} of the {blogOrPost}?");
+                Console.ForegroundColor = ConsoleColor.Black;
                 ans = Console.ReadLine();
                 //If the answer is not empty...
                 if(ans == null || ans.Trim() == ""){
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     logger.Warn("User attempted to input null/blank answer");
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine($"The {varNeeded} cannot be blank.");
+                    Console.ForegroundColor = ConsoleColor.Black;
                 } else {
                     //Set filledAnswer to true
                     filledAnswer = true;
@@ -188,17 +213,22 @@ namespace BlogsConsole
             //The blogs ordered by their id
             var blogQuery = db.Blogs.OrderBy(b => b.BlogId);
             //Have user choose which blog to view the posts of
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Which blog's posts do you want to view?");
+            Console.ForegroundColor = ConsoleColor.Black;
             int blogId = getValidBlogId();
             //Build a query of posts with the given blogId
             var postQuery = db.Posts.Where(p => p.BlogId == blogId).OrderBy(p => p.Title);
             //Check if that blog has any posts
             if(!postQuery.Any()){
                 //If there are no posts, say so
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("This blog doesn't have any posts.");
+                Console.ForegroundColor = ConsoleColor.Black;
             } else {
                 //Otherwise...
                 //Display post count
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine("Posts: " + postQuery.Count());
                 //Display all posts
                 foreach(Post p in postQuery){
@@ -206,6 +236,7 @@ namespace BlogsConsole
                     Console.WriteLine($"{p.Content}");
                     Console.WriteLine("----------");
                 }
+                Console.ForegroundColor = ConsoleColor.Black;
             }
             logger.Info("viewPosts method complete");
         }
@@ -236,7 +267,7 @@ namespace BlogsConsole
             Personal Touches:
             - Menus in special color - green
             - Listing of blogs/posts in other special color - cyan
-            - User prompting in White
+            - Default is Black
             - Errors in orange?
 
             Loop until user wants to quit
@@ -255,7 +286,7 @@ namespace BlogsConsole
                 Console.WriteLine("[3] Create a post");
                 Console.WriteLine("[4] View all posts");
                 Console.WriteLine("[5] Quit");
-                Console.ForegroundColor = ConsoleColor.White;
+                Console.ForegroundColor = ConsoleColor.Black;
                 //Save the answer
                 string ans = Console.ReadLine();
                 logger.Info("Main Menu switch");
@@ -281,7 +312,7 @@ namespace BlogsConsole
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("Goodbye!");
                         Console.WriteLine("Shutting down...");
-                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.ForegroundColor = ConsoleColor.Black;
                         progRun = false;
                         break;
                 }
