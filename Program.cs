@@ -160,12 +160,29 @@ namespace BlogsConsole
         }
 
         //This method will view posts
-        static void viewPosts(BlogsConsole.BloggingContext db){
+        static void viewPosts(){
             //The blogs ordered by their id
             var blogQuery = db.Blogs.OrderBy(b => b.BlogId);
             //Have user choose which blog to view the posts of
             Console.WriteLine("Which blog's posts do you want to view?");
             int blogId = getValidBlogId();
+            //Build a query of posts with the given blogId
+            var postQuery = db.Posts.Where(p => p.BlogId == blogId).OrderBy(p => p.Title);
+            //Check if that blog has any posts
+            if(!postQuery.Any()){
+                //If there are no posts, say so
+                Console.WriteLine("This blog doesn't have any posts.");
+            } else {
+                //Otherwise...
+                //Display post count
+                Console.WriteLine("Posts: " + postQuery.Count());
+                //Display all posts
+                foreach(Post p in postQuery){
+                    Console.WriteLine($"{p.Title}");
+                    Console.WriteLine($"{p.Content}");
+                    Console.WriteLine("----------");
+                }
+            }
         }
         
         // create static instance of Logger
@@ -232,6 +249,7 @@ namespace BlogsConsole
                         break;
                     case "4": 
                         logger.Info("View all posts");
+                        viewPosts();
                         break;
                     default:
                         logger.Info("Quit program");
