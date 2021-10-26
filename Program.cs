@@ -34,7 +34,7 @@ namespace BlogsConsole
                 logger.Info("Creating blog...");
                 // Create and save a new Blog
                 Console.Write("Enter a name for a new Blog: ");
-                var name = Console.ReadLine();
+                string name = getFilledAnswer("name", "blog");
                 var blog = new Blog { Name = name };
                 
                 db.AddBlog(blog);
@@ -168,9 +168,12 @@ namespace BlogsConsole
                 logger.Info("Begin information gathering loop");
                 //Prompt the user for the value
                 Console.WriteLine($"What is the {varNeeded} of the {blogOrPost}?");
+                ans = Console.ReadLine();
                 //If the answer is not empty...
-                if(ans.Trim() != null){
+                if(ans == null || ans.Trim() == ""){
                     logger.Warn("User attempted to input null/blank answer");
+                    Console.WriteLine($"The {varNeeded} cannot be blank.");
+                } else {
                     //Set filledAnswer to true
                     filledAnswer = true;
                 }
