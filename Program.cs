@@ -7,7 +7,7 @@ namespace BlogsConsole
 {
     class Program
     {
-        //This method will allow the user to view all blogs
+        //This method will allow the user to view all blogs - pass in the database
         static void viewBlogs(BlogsConsole.BloggingContext db){
             //Display number of blogs
             int count = db.Blogs.Count();
@@ -50,6 +50,7 @@ namespace BlogsConsole
             }
         }
 
+        //This method will allow the user to add a post to a selected blog - pass in the database
         static void addPost(BlogsConsole.BloggingContext db){
             //If the post input is valid
             bool validPost = false;
@@ -123,6 +124,7 @@ namespace BlogsConsole
         }
         
         //This method will get a non-null, non-empty answer that goes into either a post or a blog
+            //Pass in the name of the variable requested and either "blog" or "post"
         static string getFilledAnswer(string varNeeded, string blogOrPost){
             string ans = null;
             bool filledAnswer = false;
@@ -139,6 +141,11 @@ namespace BlogsConsole
             return ans;
         }
 
+        //This method will view posts
+        static void viewPosts(BlogsConsole.BloggingContext db){
+
+        }
+        
         // create static instance of Logger
         private static NLog.Logger logger = NLogBuilder.ConfigureNLog(Directory.GetCurrentDirectory() + "\\nlog.config").GetCurrentClassLogger();
         
