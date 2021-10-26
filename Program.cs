@@ -8,7 +8,7 @@ namespace BlogsConsole
     class Program
     {
         //This method will allow the user to view all blogs - pass in the database
-        static void viewBlogs(BlogsConsole.BloggingContext db){
+        static void viewBlogs(){
             //Display number of blogs
             int count = db.Blogs.Count();
             Console.WriteLine("Blog Count:" + count.ToString());
@@ -24,7 +24,7 @@ namespace BlogsConsole
         }
         
         //This method will allow the user to add a blog - pass in the database
-        static void addBlog(BlogsConsole.BloggingContext db){
+        static void addBlog(){
             try
             {
                 // Create and save a new Blog
@@ -51,76 +51,94 @@ namespace BlogsConsole
         }
 
         //This method will allow the user to add a post to a selected blog - pass in the database
-        static void addPost(BlogsConsole.BloggingContext db){
-            //If the post input is valid
-            bool validPost = false;
+        static void addPost(){
             //If the user wants to add more posts or not
             bool lastPost = false;
-            //All blogs will be displayed, ordered by their ID
-            var blogQuery = db.Blogs.OrderBy(b => b.BlogId);
-            string blogAns = null;
+            int blogId = 0;
             //Prompt the user for a Blog number until a valid one is entered
             do{
                 try{
                     Console.WriteLine("Which blog do you wish to post to?: ");
-                    foreach (var blog in blogQuery){
-                        Console.WriteLine($"[{blog.BlogId}] {blog.Name}");
-                    }
-                blogAns = Console.ReadLine();
+                    blogId = getValidBlogId();
                 } catch (Exception ex){
                     logger.Error(ex.Message);
                 }
-                int blogNum = 0;
-                //If the blogAns is not a number...
-                if(!Int32.TryParse(blogAns, out blogNum)){
-                    logger.Info("Non-integer answer");
-                    //Tell the user such
-                    Console.WriteLine("Please enter a valid number\n");
-                    //Break
-                    validPost = false;
+                //Once the user has given a valid id, start prompting for post info
+                logger.Info("Valid blog id given");
+
+                //Prompt the user for the Title
+                Console.WriteLine("What is the title of the post?");
+                string title = Console.ReadLine();
+
+                //Prompt the user for theContent
+                Console.WriteLine("What is the content of the post?");
+                string content = Console.ReadLine();
+
+                //Add to the post with the given ID
+                Post post = new Post();
+                post.BlogId = blogId;
+                post.Title = title;
+                post.Content = content;
+                db.AddPost(post);
+
+                //Ask if the user wants to add another post
+                Console.WriteLine("Add another post? [Y/N]: ");
+                string contAns = Console.ReadLine();
+                if(contAns.ToLower()[0] == 'y'){
+                    //If the user answered yes, continue
                     continue;
-                } else{
-                    //If we know that it's a number, check if it exists in the table
-                    //Make a query that contains all the values that have this number as the ID
-                    var idQuery = db.Blogs.Where(b => b.BlogId == blogNum);
-                    //If the id is empty, the key doesn't exist
-                    if(!idQuery.Any()){
-                        logger.Info("Blog id does not exist");
-                        //Tell the user the blog doesn't exist
-                        Console.WriteLine("There is no blog with the given ID.\n");
-                        //Continue
+                } else {
+                    //Otherwise, set lastPost to true
+                    lastPost = true;
+                }
+            } while(!lastPost);     
+        }
+        
+        //This method displays the blogs as a menu - pass in the database
+        static void blogMenu(){
+            //Blog query
+            var blogQuery = db.Blogs.OrderBy(b => b.BlogId);
+            //Display the blogs by order of blog id
+            foreach(Blog b in blogQuery){
+                Console.WriteLine($"[{b.BlogId}] {b.Name}");
+            }
+            return;
+        }
+        
+        //This method will make sure the user entered a valid choice for a blog, and return said Id
+        static int getValidBlogId(){
+            //Did the user put in a valid Id?
+            bool validId = false;
+            int id = 0;
+            do{
+                //Until the user inputs a valid id...
+                //Display their choices
+                blogMenu();
+                //Take in the id
+                string input = Console.ReadLine();
+                //Test if the input is an integer
+                if(!Int32.TryParse(input, out id)){
+                    //If not, tell the user it must be
+                    Console.WriteLine("The Blog ID must be an integer");
+                    //Continue and reloop
+                    continue;
+                } else {
+                    //Otherwise
+                    //Check if there's a blog with that id
+                    var idQuery = db.Blogs.Where(b => b.BlogId == id);
+                    //If there're any values in the query
+                    if(idQuery.Any()){
+                        //Set validID to true and break out of the loop
+                        validId = true;
                         continue;
                     } else {
-                        logger.Info("Valid blog id given");
-                        //If it's a valid id...
-                        //Prompt the user for the Title
-                        Console.WriteLine("What is the title of the post?");
-                        string title = Console.ReadLine();
-                        //Prompt the user for theContent
-                        Console.WriteLine("What is the content of the post?");
-                        string content = Console.ReadLine();
-                        //Add to the post with the given ID
-                        Post post = new Post();
-                        post.BlogId = blogNum;
-                        post.Title = title;
-                        post.Content = content;
-                        db.AddPost(post);
-
-                        //Ask if the user wants to add another post
-                        Console.WriteLine("Add another post? [Y/N]: ");
-                        string contAns = Console.ReadLine();
-                        if(contAns.ToLower()[0] == 'y'){
-                            //If the user answered yes, continue
-                            continue;
-                        } else {
-                            //Otherwise, set lastPost to true
-                            lastPost = true;
-                        }
+                        //Otherwise, tell the user there's no blog with that id and re=loop
+                        Console.WriteLine("There is no blog with the given ID");
+                        continue;
                     }
                 }
-                logger.Info("Valid post value: " + validPost);
-                logger.Info("Last post value: " + lastPost);
-            } while(!validPost && !lastPost);     
+            } while (!validId);
+            return id;
         }
         
         //This method will get a non-null, non-empty answer that goes into either a post or a blog
@@ -143,12 +161,19 @@ namespace BlogsConsole
 
         //This method will view posts
         static void viewPosts(BlogsConsole.BloggingContext db){
-
+            //The blogs ordered by their id
+            var blogQuery = db.Blogs.OrderBy(b => b.BlogId);
+            //Have user choose which blog to view the posts of
+            Console.WriteLine("Which blog's posts do you want to view?");
+            int blogId = getValidBlogId();
         }
         
         // create static instance of Logger
         private static NLog.Logger logger = NLogBuilder.ConfigureNLog(Directory.GetCurrentDirectory() + "\\nlog.config").GetCurrentClassLogger();
-        
+        //create static instance of database
+        private static BloggingContext db = new BloggingContext();
+
+
         static void Main(string[] args)
         {
 
@@ -174,9 +199,6 @@ namespace BlogsConsole
 
             Loop until user wants to quit
             */
-
-            //Create the database
-            var db = new BloggingContext();
             
             logger.Info("Program started");
             //Is the program still going? 
@@ -198,15 +220,15 @@ namespace BlogsConsole
                 switch(ans){
                     case "1":
                         logger.Info("View all blogs");
-                        viewBlogs(db);
+                        viewBlogs();
                         break;
                     case "2":
                         logger.Info("Create a blog");   
-                        addBlog(db); 
+                        addBlog(); 
                         break;
                     case "3":
                         logger.Info("Create a post");
-                        addPost(db);
+                        addPost();
                         break;
                     case "4": 
                         logger.Info("View all posts");
