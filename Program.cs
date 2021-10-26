@@ -50,6 +50,95 @@ namespace BlogsConsole
             }
         }
 
+        static void addPost(BlogsConsole.BloggingContext db){
+            //If the post input is valid
+            bool validPost = false;
+            //If the user wants to add more posts or not
+            bool lastPost = false;
+            //All blogs will be displayed, ordered by their ID
+            var blogQuery = db.Blogs.OrderBy(b => b.BlogId);
+            string blogAns = null;
+            //Prompt the user for a Blog number until a valid one is entered
+            do{
+                try{
+                    Console.WriteLine("Which blog do you wish to post to?: ");
+                    foreach (var blog in blogQuery){
+                        Console.WriteLine($"[{blog.BlogId}] {blog.Name}");
+                    }
+                blogAns = Console.ReadLine();
+                } catch (Exception ex){
+                    logger.Error(ex.Message);
+                }
+                int blogNum = 0;
+                //If the blogAns is not a number...
+                if(!Int32.TryParse(blogAns, out blogNum)){
+                    logger.Info("Non-integer answer");
+                    //Tell the user such
+                    Console.WriteLine("Please enter a valid number\n");
+                    //Break
+                    validPost = false;
+                    continue;
+                } else{
+                    //If we know that it's a number, check if it exists in the table
+                    //Make a query that contains all the values that have this number as the ID
+                    var idQuery = db.Blogs.Where(b => b.BlogId == blogNum);
+                    //If the id is empty, the key doesn't exist
+                    if(!idQuery.Any()){
+                        logger.Info("Blog id does not exist");
+                        //Tell the user the blog doesn't exist
+                        Console.WriteLine("There is no blog with the given ID.\n");
+                        //Continue
+                        continue;
+                    } else {
+                        logger.Info("Valid blog id given");
+                        //If it's a valid id...
+                        //Prompt the user for the Title
+                        Console.WriteLine("What is the title of the post?");
+                        string title = Console.ReadLine();
+                        //Prompt the user for theContent
+                        Console.WriteLine("What is the content of the post?");
+                        string content = Console.ReadLine();
+                        //Add to the post with the given ID
+                        Post post = new Post();
+                        post.BlogId = blogNum;
+                        post.Title = title;
+                        post.Content = content;
+                        db.AddPost(post);
+
+                        //Ask if the user wants to add another post
+                        Console.WriteLine("Add another post? [Y/N]: ");
+                        string contAns = Console.ReadLine();
+                        if(contAns.ToLower()[0] == 'y'){
+                            //If the user answered yes, continue
+                            continue;
+                        } else {
+                            //Otherwise, set lastPost to true
+                            lastPost = true;
+                        }
+                    }
+                }
+                logger.Info("Valid post value: " + validPost);
+                logger.Info("Last post value: " + lastPost);
+            } while(!validPost && !lastPost);     
+        }
+        
+        //This method will get a non-null, non-empty answer that goes into either a post or a blog
+        static string getFilledAnswer(string varNeeded, string blogOrPost){
+            string ans = null;
+            bool filledAnswer = false;
+            //While not having a valid answer...
+            do{
+                //Prompt the user for the value
+                Console.WriteLine($"What is the {varNeeded} of the {blogOrPost}?");
+                //If the answer is not empty...
+                if(ans.Trim() != null){
+                    //Set filledAnswer to true
+                    filledAnswer = true;
+                }
+            } while (!filledAnswer);
+            return ans;
+        }
+
         // create static instance of Logger
         private static NLog.Logger logger = NLogBuilder.ConfigureNLog(Directory.GetCurrentDirectory() + "\\nlog.config").GetCurrentClassLogger();
         
@@ -110,6 +199,7 @@ namespace BlogsConsole
                         break;
                     case "3":
                         logger.Info("Create a post");
+                        addPost(db);
                         break;
                     case "4": 
                         logger.Info("View all posts");
