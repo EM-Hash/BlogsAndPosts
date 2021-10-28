@@ -15,7 +15,11 @@ namespace BlogsConsole
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Blog Count:" + count.ToString());
             Console.ForegroundColor = ConsoleColor.Black;
-            // Display all Blogs from the database
+            //If there are no blogs to display, break here
+            if(!(count > 0)){
+                return;
+            }
+            // Otherwise, Display all Blogs from the database
             var query = db.Blogs.OrderBy(b => b.Name);
 
             logger.Info("Start viewing blogs...");
@@ -74,15 +78,13 @@ namespace BlogsConsole
                 logger.Info("Prompting user for post info");
                 //Prompt the user for the Title
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("What is the title of the post?");
+                string title = getFilledAnswer("title", "post");
                 Console.ForegroundColor = ConsoleColor.Black;
-                string title = Console.ReadLine();
 
                 //Prompt the user for theContent
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("What is the content of the post?");
+                string content = getFilledAnswer("content","post");
                 Console.ForegroundColor = ConsoleColor.Black;
-                string content = Console.ReadLine();
                 logger.Info("Post information gathered");
 
                 //Add to the post with the given ID
@@ -217,6 +219,8 @@ namespace BlogsConsole
             Console.WriteLine("Which blog's posts do you want to view?");
             Console.ForegroundColor = ConsoleColor.Black;
             int blogId = getValidBlogId();
+            //Get the blog's name
+            string name = blogQuery.Where(b => b.BlogId == blogId).First().Name;
             //Build a query of posts with the given blogId
             var postQuery = db.Posts.Where(p => p.BlogId == blogId).OrderBy(p => p.Title);
             //Check if that blog has any posts
@@ -227,12 +231,15 @@ namespace BlogsConsole
                 Console.ForegroundColor = ConsoleColor.Black;
             } else {
                 //Otherwise...
+
                 //Display post count
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine("Posts: " + postQuery.Count());
                 //Display all posts
                 foreach(Post p in postQuery){
-                    Console.WriteLine($"{p.Title}");
+                    //Display blog name, along with the post info
+                    Console.WriteLine($"Blog: {name}");
+                    Console.WriteLine($"Post Title: {p.Title}");
                     Console.WriteLine($"{p.Content}");
                     Console.WriteLine("----------");
                 }
